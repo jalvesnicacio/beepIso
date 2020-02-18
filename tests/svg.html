@@ -1,0 +1,140 @@
+
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ZIM SVG</title>
+
+<!-- Welcome to ZIM at http://zimjs.com - Code Interactive Media Pizzazz! 	        -->
+<!-- ZIM runs on the HTML Canvas powered by JavaScript and CreateJS http://createjs.com -->
+<!-- Founded by Inventor Dan Zen - http://danzen.com - Canadian New Media Award Winner 	-->
+<!-- ZIM is free to use. You can donate to help improve ZIM at http://zimjs.com/donate 	-->
+
+<script src="https://zimjs.org/cdn/1.2.0/createjs_min.js"></script>
+<script src="https://zimjs.org/cdn/10.5.3/zim.js"></script>
+<!-- use zimjs.com/distill for minified individual functions! -->
+
+<!-- <script src="https://zimjs.com/ten/header.js"></script> -->
+
+<script>
+
+// SCALING OPTIONS
+// scaling can have values as follows with full being the default
+// "fit"    sets canvas and stage to dimensions and scales to fit inside window size
+// "outside"    sets canvas and stage to dimensions and scales to fit outside window size
+// "full"    sets stage to window size with no scaling
+// "tagID"    add canvas to HTML tag of ID - set to dimensions if provided - no scaling
+
+var scaling = "fit"; // this will resize to fit inside the screen dimensions
+var width = 1024;
+var height = 768;
+var color = light;
+var outerColor = darker;
+
+// as of ZIM 5.5.0 you do not need to put zim before ZIM functions and classes
+var frame = new Frame(scaling, width, height, color, outerColor, "queue.svg");
+frame.on("ready", function() {
+    zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
+
+    var stage = frame.stage;
+    var stageW = frame.width;
+    var stageH = frame.height;
+
+    // There are three ways to bring in SVG
+    // 1. reading from a tag on the page (display:none the tag)
+    // 2. reading from a variable that is an SVG string
+    // 3. loading in an SVG file using the Frame asset parameter or loadAssets()
+
+    // We will load in an SVG file
+    // the first two options are commented out at the bottom
+
+    // BITMAP
+    // pass in SVG and a callback function that receives the Bitmap as its parameter
+    // assign bitmap to an outside variable if you need a reference outside this function
+    svgToBitmap(frame.asset("queue.svg"), function(bitmap) {
+        bitmap.center().mov(-200).drag();
+        stage.update();
+    });
+
+    // CONTAINER
+    // load SVG into a Container and recreate with Squiggle, Blob, Rectangle and Circle
+    // Thanks KV for all the work to get this to work!
+    // This handles most SVG but not ARC and not SVG with Styles
+    // This will make the SVG editable
+    // You can also animate, drag along these paths and add LabelOnPath, etc.
+    // SEE https://zimjs.com/nio/
+    // the false makes it so separate shapes are not made for each path
+    var svgContainer = new SVGContainer({
+        svg:frame.asset("lady.svg"),
+        splitTypes:false,
+        // showControls:false,
+        // interactive:false
+    }).center().mov(300);
+
+    new Label("svgToBitmap()").sca(.8).alp(.6).loc(180, 695);
+    new Label("SVGContainer()").sca(.8).alp(.6).loc(608, 695);
+
+    // HEADER / FOOTER
+    // if copying code - do not copy header and footer
+    makeHeader("ZIM - SVG to Bitmap and SVG Container (with Squiggles and Blobs) ", "svgToBitmap,SVGContainer", true, "TEN", "../ten.html");
+    makeFooter();
+
+
+    // Here are the first two ways mentioned to receive SVG
+    // These show the svgToBitmap but the SVGContainer works the same way
+
+    // // EXAMPLE 1 - pass in a reference to the svg tag (or document.getElementByID("vector"))
+    // // note the SVG tag in the HTML body - and the style to hide the SVG tag
+    // svgToBitmap(zid("vector"), function(bitmap) {
+    //     bitmap.center().mov(-200).drag();
+    //     stage.update();
+    // });
+
+    // // EXAMPLE 2 - pass in a string version of the SVG tag (or as one line)
+    //     var svg = `
+    // <svg id="vector" width="500" height="500" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:svg="http://www.w3.org/2000/svg" viewBox="0 0 312 521" version="1.0">
+    //     <g id="g10910" fill-rule="evenodd" transform="translate(-42,-41)" stroke="#000" stroke-width="1px" fill="#030000">
+    //       <path id="path2161" d="m251.85 119.04c7.85 10.45-9.81 16.76-18.17 30.55-2.85 12.24-2.21 36.87 14.19 53.8 32.19 26.82 37.42 29.03 43.55 46.3 9.17 26.46 0.66 51.88-4.67 74.37l-5.6 35.26c5.16 36.57 13.23 73.14 2.24 109.71 0 0-9.41 23.85-9.52 26.86-0.11 3.35 11.7 27.23 11.2 34.15-5.93 6.24-8.11 9.19-35.45 7.29-15.49-1.07-27.84 11.85-40.11 15.65-9.69 1.43-42.85 7.71-103.55-6.71l-58.21-20.15c22.987-4.05 50.354-22.62 83.36-59.89 26.18-30.63 45.98-58.47 50.38-109.15 1.72-14.81 16.41-42.72 26.9-67.16 3.57-13.91 10.43-44.58-12.88-91.8l-23.47-35.75c-3.39-5.41-0.4-12.01 1.09-17.42-10.83 1.46-14.09-3.89-20.15-6.71 2.78-7.2 4.73-14.8 15.67-17.92 0.6 0 15.85-1.36 15.05 0.99-2.33 23.07-2.99 36.58 17.19 49.02 10.61-1.68-1.65-21.96 22.89-24.57 11.99-1.28 1.23-20.59 8.68-27.67 2.39-2.06 9.37-4.87 19.39 0.95z"/>
+    //       <path id="path3134" d="m339.63 202.75c-2-0.04-13.78 2.71-14.25 7.25l25-4.75-2.5 1-21 5.25 21.25-3.25-4.75 1.75-18.75 4.5 20.75-3c-10.76 5.32-17.79 2.86-29.25 11.75-1.78 3.99 9.28 6.24 18 6.25-7.75 0.48-15 2.44-22.75-0.25-18.07-4.54-30.27-13.97-44.75-21.5 4.57-3.24 5.02-7.07 6.5-10.75-0.49 0.73 0.1-8.29 0.46-5 0.29 2.71 26.96 29.78 34.54 28 8.2-1.15 10.09-5.9 14-9.5 5.13-3.37 4.08-6.29 17.5-10.25 2.01 0.61 1.93 0.58 0 2.5z"/>
+    //       <path id="path5074" d="m135.38 154l-13-21c-10.7-1.57-21.12-4.08-33.748 0.75l-13.75 4.75 17-3-11.75 13.25 13.25-11.25-8.5 17.5 8-10.25-3 13.5 7-13.5c0.498-2.33 6.238-5.92 9.248-6.75 5.35 2.27 8.68 1.28 12.75 1l0.25 22 16.25-7z"/>
+    //       <path id="path7014" d="m250.63 78.5c-6.15 9.956-17.88 2.044-27 2.5l7 8.5c-2.91-0.61-5.24 0.996-10.75-1.5-4.77-2.267-3.74-2.021-6.75-1.5v3.5c-2.35 1.969-11.16 2.045-17.38 0.177l-0.62 23.323s-5 5.5-3.5 2.5 4.15-29.5 4.15-29.5c-2.61-8.833-6.53-17.667-5.65-26.5 3.67-28.903 46.55-8.728 51-5.5 3.69 3.134 11.74 12.218 9.5 24z"/>
+    //     </g>
+    // </svg>
+    // `
+    //     svgToBitmap(svg, function(bitmap) {
+    //         bitmap.center().mov(-200).drag();
+    //         stage.update();
+    //     });
+
+
+    stage.update();
+
+}); // end of ready
+
+</script>
+
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+
+<style>
+    svg {display:none;}
+</style>
+
+</head>
+
+<body>
+<!-- canvas with id="myCanvas" is made by zim Frame -->
+<svg id="vector" width="500" height="500" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:svg="http://www.w3.org/2000/svg" id="svg2" viewBox="0 0 312 521" version="1.0">
+    <g id="g10910" fill-rule="evenodd" transform="translate(-42,-41)" stroke="#000" stroke-width="1px" fill="#030000">
+      <path id="path2161" d="m251.85 119.04c7.85 10.45-9.81 16.76-18.17 30.55-2.85 12.24-2.21 36.87 14.19 53.8 32.19 26.82 37.42 29.03 43.55 46.3 9.17 26.46 0.66 51.88-4.67 74.37l-5.6 35.26c5.16 36.57 13.23 73.14 2.24 109.71 0 0-9.41 23.85-9.52 26.86-0.11 3.35 11.7 27.23 11.2 34.15-5.93 6.24-8.11 9.19-35.45 7.29-15.49-1.07-27.84 11.85-40.11 15.65-9.69 1.43-42.85 7.71-103.55-6.71l-58.21-20.15c22.987-4.05 50.354-22.62 83.36-59.89 26.18-30.63 45.98-58.47 50.38-109.15 1.72-14.81 16.41-42.72 26.9-67.16 3.57-13.91 10.43-44.58-12.88-91.8l-23.47-35.75c-3.39-5.41-0.4-12.01 1.09-17.42-10.83 1.46-14.09-3.89-20.15-6.71 2.78-7.2 4.73-14.8 15.67-17.92 0.6 0 15.85-1.36 15.05 0.99-2.33 23.07-2.99 36.58 17.19 49.02 10.61-1.68-1.65-21.96 22.89-24.57 11.99-1.28 1.23-20.59 8.68-27.67 2.39-2.06 9.37-4.87 19.39 0.95z"/>
+      <path id="path3134" d="m339.63 202.75c-2-0.04-13.78 2.71-14.25 7.25l25-4.75-2.5 1-21 5.25 21.25-3.25-4.75 1.75-18.75 4.5 20.75-3c-10.76 5.32-17.79 2.86-29.25 11.75-1.78 3.99 9.28 6.24 18 6.25-7.75 0.48-15 2.44-22.75-0.25-18.07-4.54-30.27-13.97-44.75-21.5 4.57-3.24 5.02-7.07 6.5-10.75-0.49 0.73 0.1-8.29 0.46-5 0.29 2.71 26.96 29.78 34.54 28 8.2-1.15 10.09-5.9 14-9.5 5.13-3.37 4.08-6.29 17.5-10.25 2.01 0.61 1.93 0.58 0 2.5z"/>
+      <path id="path5074" d="m135.38 154l-13-21c-10.7-1.57-21.12-4.08-33.748 0.75l-13.75 4.75 17-3-11.75 13.25 13.25-11.25-8.5 17.5 8-10.25-3 13.5 7-13.5c0.498-2.33 6.238-5.92 9.248-6.75 5.35 2.27 8.68 1.28 12.75 1l0.25 22 16.25-7z"/>
+      <path id="path7014" d="m250.63 78.5c-6.15 9.956-17.88 2.044-27 2.5l7 8.5c-2.91-0.61-5.24 0.996-10.75-1.5-4.77-2.267-3.74-2.021-6.75-1.5v3.5c-2.35 1.969-11.16 2.045-17.38 0.177l-0.62 23.323s-5 5.5-3.5 2.5 4.15-29.5 4.15-29.5c-2.61-8.833-6.53-17.667-5.65-26.5 3.67-28.903 46.55-8.728 51-5.5 3.69 3.134 11.74 12.218 9.5 24z"/>
+    </g>
+</svg>
+
+<script>
+var r=Math.round(Math.random()*1000000);
+document.write('<img src=/cgi-bin/traffic_plus?company=danzen&page=zimSVG&r='+r+' width=1 height=1>');
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ZIM SVG</title>
+
+<script src="https://zimjs.org/cdn/1.2.0/createjs_min.js"></script>
+<script src="https://zimjs.org/cdn/10.5.3/zim.js"></script>
+
+<script>
+  var scaling = "board"; // this will resize to fit inside the screen dimensions
+  var width = 1200;
+  var height = 800;
+  var color = light;
+  var outerColor = darker;
+  var frame = new Frame(scaling, width, height);
+
+  frame.on("ready", function() {
+     var stage = frame.stage;
+     var stageW = frame.width;
+     var stageH = frame.height;
+
+     //Processor declaration:
+     var queue; var countDecimal; var applyFunction;
+
+     frame.outerColor = "#444";
+     frame.color = "#fff";
+
+     var holder = new Container();
+
+     var tiles = new Tile(new Rectangle(50,50,frame.light,"#8c8c8c",1).centerReg(), 10, 10)
+         .rot(45)
+         .center(holder)
+     holder.sca(2,1).center().mov(0,50);
+     zog(tiles);
+
+       //var ball = new Circle(2).center();
+       //var ball2 = new Circle(2).pos(670.71, 167.15);
+
+     frame.loadAssets(["img/applyFunction.png", "img/countDecimal.png", "img/fork.png"]);
+     frame.on("complete", function() {
+        applyFunction = frame.asset("img/applyFunction.png"); // logo is a Bitmap
+        applyFunction.pos(500, 120).drag();
+
+        countDecimal = frame.asset("img/countDecimal.png");
+        countDecimal.pos(300,300).drag();
+
+        fork = frame.asset("img/fork.png");
+        fork.pos(150,300).drag();
+
+        stage.update();
+     });
+
+     function cartesianToIsometric(cartesian_point){
+       var isometric_point = cartesian_point;
+       //isometric_point.x = cartesian_point.x - cartesian_point.y;
+       //isometric_point.y = (cartesian_point.x + cartesian_point.y)/2;
+       return isometric_point;
+     }
+
+
+     tiles.on("mouseover", function(e){
+       e.target.color = frame.grey;
+       stage.update();
+       //zog(e);
+     });
+
+     tiles.on("mouseout", function(e){
+       e.target.color = frame.light;
+       stage.update();
+     });
+
+     tiles.on("click", function(e) {
+         var point = tiles.localToGlobal(e.target.x, e.target.y);
+         zog("antes: " + point.x);
+         //zog("queue x: " + queue.x);
+         point = cartesianToIsometric(point);
+         //zog("depois: " + point);
+         countDecimal.animate({
+             obj:{x:point.x, y:point.y},
+             time:500
+         });
+         //zog("queue x: " + queue.x);
+     });
+     // var damp = new ProportionDamp(0, stageH, .8, 1.3, .5).immediate(queue.y);
+     // queue.sca(damp.convert(queue.y));
+     // Ticker.add(function() {queue.sca(damp.convert(queue.y));});
+
+     stage.update();
+
+
+  });
+
+</script>
+</head>
+<body>
+  <div id="board">  </div>
+</body>
+</html>

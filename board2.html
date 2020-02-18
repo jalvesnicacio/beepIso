@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ZIM SVG</title>
+
+<script src="https://zimjs.org/cdn/1.2.0/createjs_min.js"></script>
+<script src="https://zimjs.org/cdn/10.5.3/zim.js"></script>
+<!-- bring in EasyStar for path finding and game module for Board -->
+<script src="https://d309knd7es5f10.cloudfront.net/easystar-0.4.3.min.js"></script>
+<script src="https://d309knd7es5f10.cloudfront.net/game_2.0.js"></script>
+
+<script>
+  var scaling = "board"; // this will resize to fit inside the screen dimensions
+  var width = 1500;
+  var height = 800;
+  var color = "#fff";
+  var outerColor = darker;
+  var frame = new Frame({scaling, width, height,color,outerColor});
+
+  frame.on("ready", function() {
+    zog("Read from ZIM frame...");
+
+     var stage = frame.stage;
+     var stageW = frame.width;
+     var stageH = frame.height;
+
+     //Processor declaration:
+     var queue;
+
+
+     ZIMONON = true; // set this to true if using ZIMON - like JSON but with any object
+
+     //frame.outerColor = "#444";
+     //frame.color = "#fff";
+     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     // BOARD
+     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   // the Board() class - not to be confused with the LeaderBoard() class ;-)
+   // this defaults to isometric but can be used with top view
+   // or toggled later with board.isometric = false;
+
+   var board = new Board({
+       backgroundColor:frame.light,
+       borderColor:"#8c8c8c",
+       borderWidth:1,
+       num: 10,
+       arrows: false,
+       // icon:frame.makeCircles(20),
+       // labels:true,
+       // isometric:false,
+       // info:[,,,[,,{data:"0", color:blue, items:[new zim.Person()]},,,,,,,,],,,,,,,,]
+       // indicatorType:"rectangle",
+       //indicatorBorderColor:silver,
+       //indicatorBorderColor:-1
+   }).center();
+
+   var player; var orb; var tree; var queue;
+
+   if (!localStorage || !localStorage.iso) {
+        // first time so let's set up the board how we want it
+
+        // example - adding extra rows and columns
+        // can also add row(index) and col(index) to insert rows
+        // or adjust info parameter.
+        // Then positioning the board
+        loop(10, function () {
+            board.addCol();
+            board.addRow();
+        });
+        board.positionBoard(5,5);
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // BOARD ITEMS
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        frame.loadAssets("img/teste.png");
+        frame.on("complete", function() {
+          queue = frame.asset("img/teste.png");
+          //queue.scaleTo(stage,10);
+          board.add(queue,6,4);
+          stage.update();
+          zog(board);
+        });
+
+
+
+
+        // add a player
+        player = new Person(yellow,silver,brown);
+        //player.sca(.5);
+        board.add(player, 1, 0);
+
+        // add a orb
+        orb = new Orb({color2:white});
+        board.add(orb, 2, 0);
+
+      } else {
+
+      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // BOARD FROM LOCALSTORAGE
+      // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      // reading in Board data including player, orb and tree, colors, etc.
+      // example handling saving data to localStorage using ZIMON
+      // for a database use asynch and a similar ZIMON technique
+      board.info = ZIMON.parse(localStorage.iso);
+
+      // note, if you want to save the starting position of the Board
+      // then store another localStorage with startCol and startRow
+      // and use board.position(localStorage.startCol, localStorage.startRow)
+      board.positionBoard(5,5);
+      board.setArrows();
+      board.update();
+
+      // need to save player, orb and tree as the variables used the first time
+      var items = board.getAllItems();
+      zim.loop(items, function (item) {
+          if (item.type=="Person") player = item;
+          else if (item.type=="Orb") orb = item;
+          else if (item.type=="Tree" && zot(tree)) tree = item;
+          // there are two trees, so once we get the first tree
+          // do not reassign the next tree to tree.
+          // can store a custom data property in info.data for each item
+          // to distinguish items of the same type
+      });
+  }
+
+
+
+
+
+});
+</script>
+</head>
+<body>
+  <div id="board">  </div>
+</body>
+</html>

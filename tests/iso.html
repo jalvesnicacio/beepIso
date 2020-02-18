@@ -1,0 +1,115 @@
+
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ZIM Isometric (click)</title>
+
+<script src="js/createjs_min.js"></script>
+<script>
+    var zon = true; // set to false to turn off console messages from zim
+    var zns = false; // set to true to require zim namespace - eg. new zim.Frame()
+</script>
+<script src="js/zim.js"></script>
+
+<script>
+
+// SCALING OPTIONS
+// scaling can have values as follows with full being the default
+// "fit"    sets canvas and stage to dimensions and scales to fit inside window size
+// "outside"    sets canvas and stage to dimensions and scales to fit outside window size
+// "full"    sets stage to window size with no scaling
+// "tagID"    add canvas to HTML tag of ID - set to dimensions if provided - no scaling
+
+var scaling = "board"; // this will resize to fit inside the screen dimensions
+var width = 1024;
+var height = 768;
+
+// as of ZIM 5.5.0 you do not need to put zim before ZIM functions and classes
+var frame = new Frame(scaling, width, height);
+
+frame.on("ready", function() {
+    zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
+
+    var stage = frame.stage;
+    var stageW = frame.width;
+    var stageH = frame.height;
+
+    frame.outerColor = "#444";
+    frame.color = "#ddd";
+
+    //Label na tela:
+    new Label("ISOMETRIC BeepBeep").pos(30, 60, stage).alp(.5);
+
+
+    // var button = new Button({
+    //     label:"DRAG",
+    //     corner:5,
+    //     color:frame.gray,
+    //     rollColor:frame.blue
+    // }).pos(750, 50, stage);
+    // button.on("click", function(){zgo("iso2.html");});
+
+    var holder = new Container();
+
+    var tiles = new Tile(new Rectangle(50,50,frame.light,frame.darker,2).centerReg(), 8, 8)
+        .rot(45)
+        .center(holder)
+    holder.sca(2,1).center().mov(0,50);
+
+    frame.loadAssets("img/queue.png");
+    var logo = frame.asset("img/queue.png"); // logo is a Bitmap
+    logo.pos(10,0).drag();
+
+    var ball = new Circle(40).reg(0,30).center().mov(0, -15);
+    var shadow = new Circle(40).reg(-30,0).alp(.15).pos(0,40,ball,0).rot(10).sca(1.2,.4);
+    shadow.filters = [new createjs.BlurFilter(12, 12, 1)];
+    shadow.cache();
+
+
+
+
+    // svgToBitmap(frame.asset("queue.svg"), function(bitmap) {
+    //     bitmap.center().mov(-200).drag();
+    //     stage.update();
+    // });
+
+    ball.colorCommand.radialGradient([frame.red, frame.black],[.3,1],-10,-10,0,0,0,80);
+
+    tiles.on("mouseover", function(e) {
+        e.target.color = frame.grey;
+        stage.update();
+    });
+    tiles.on("mouseout", function(e) {
+        e.target.color = frame.light;
+        stage.update();
+    });
+    tiles.on("click", function(e) {
+        var point = tiles.localToGlobal(e.target.x, e.target.y);
+        ball.animate({
+            obj:{x:point.x, y:point.y},
+            time:500
+        });
+    });
+
+    // optional scaling
+    var damp = new ProportionDamp(0, stageH, .8, 1.3, .5).immediate(ball.y);
+    ball.sca(damp.convert(ball.y));
+    Ticker.add(function() {ball.sca(damp.convert(ball.y));});
+
+    stage.update(); // this is needed to show any changes
+
+}); // end of ready
+
+</script>
+
+
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+
+</head>
+
+<body>
+<!-- canvas with id="myCanvas" is made by zim Frame -->
+<div id="board"></div>
+</body>
+</html>
